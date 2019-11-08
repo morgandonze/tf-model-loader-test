@@ -2,25 +2,34 @@ node ./index.js
 
 echo "
 import { NSFWJS } from 'nsfwjs';
+import { modelFromJSON } from '@tensorflow/tfjs-layers/dist/models';
 
 const Index = () => {
   const jsModel = JSON.parse(\"$(cat jsModel.txt | sed -e 's/\"/\\\"/g')\")
-  const weightData = jsModel.weightData;
-  const buf = Buffer.from(weightData, 'base64');
+  const weightDataString = jsModel.weightData;
+  
+  const buf = Buffer.from(weightDataString, 'base64');
   const weightDataArrayBuffer = buf.buffer.slice(
     buf.byteOffset,
     buf.byteOffset + buf.byteLength
   );
+
   const modelArtefacts = {
     ...jsModel,
     weightData: weightDataArrayBuffer,
   };
+  console.log({modelArtefacts})
 
   const ioHandler = {
-    load: () => {
-      return modelArtefacts;
-    },
+    load: () => (new Promise((resolve, reject) => {
+      try {
+        resolve(modelArtefacts)
+      } catch (e) {
+        reject(e)
+      }
+    }))
   };
+  console.log(ioHandler)
 
   const options = {};
   const nsfwjs = new NSFWJS(ioHandler, options);
