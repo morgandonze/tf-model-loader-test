@@ -1,0 +1,55 @@
+node ./index.js
+
+echo "
+import { NSFWJS } from 'nsfwjs';
+import { modelFromJSON } from '@tensorflow/tfjs-layers/dist/models';
+
+const Index = () => {
+  const jsModel = JSON.parse(\"$(cat jsModel.txt | sed -e 's/\"/\\\"/g')\")
+  const weightDataString = jsModel.weightData;
+  
+  const buf = Buffer.from(weightDataString, 'base64');
+  const weightDataArrayBuffer = buf.buffer.slice(
+    buf.byteOffset,
+    buf.byteOffset + buf.byteLength
+  );
+
+  const modelArtefacts = {
+    ...jsModel,
+    weightData: weightDataArrayBuffer,
+  };
+  console.log({modelArtefacts})
+
+  const ioHandler = {
+    load: () => (new Promise((resolve, reject) => {
+      try {
+        resolve(modelArtefacts)
+      } catch (e) {
+        reject(e)
+      }
+    }))
+  };
+  console.log(ioHandler)
+
+  const options = {size: 299};
+  const nsfwjs = new NSFWJS(ioHandler, options);
+  nsfwjs.load().then(model => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = 'https://i.imgur.com/Kwxetau.jpg'
+
+    model.classify(img).then(predictions => {
+      console.log('Predictions', predictions);
+    });
+  });
+
+  return (
+    <div>
+      <p>Hello Next.js</p>
+    </div>
+  );
+};
+
+export default Index;" >> output.js
+
+mv output.js ./pages/index.js
