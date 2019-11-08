@@ -1,7 +1,7 @@
 node ./index.js
 
 echo "
-import { NSFWJS } from 'nsfwjs';
+import * as nsfwjs from 'nsfwjs';
 
 const Index = () => {
   const jsModel = JSON.parse(\"$(cat jsModel.txt | sed -e 's/\"/\\\"/g')\")
@@ -31,8 +31,7 @@ const Index = () => {
   console.log(ioHandler)
 
   const options = {size: 299};
-  const nsfwjs = new NSFWJS(ioHandler, options);
-  nsfwjs.load().then(model => {
+  nsfwjs.load(ioHandler, options).then(model => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = function () { 
