@@ -31,7 +31,7 @@ const Index = () => {
   };
   console.log(ioHandler)
 
-  const options = {};
+  const options = {size: 299};
   const nsfwjs = new NSFWJS(ioHandler, options);
   nsfwjs.load().then(model => {
     model.classify(img).then(predictions => {
